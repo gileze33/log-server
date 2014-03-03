@@ -1,0 +1,22 @@
+{
+    "name": "log-server",
+    "private": true,
+    "version": "0.0.0",
+    "description": "",
+    "dependencies": {
+        "express": "x.x",
+        "mongoose": "x.x",
+        "socket.io": "x.x",
+        "connect-mongo": "x.x",
+		"ejs": "x.x",
+		"less": "x.x"
+    },
+    "scripts": {
+        "start": "node server.js",
+        "debug": "node debug server.js"
+    },
+    "main": "server.js",
+    "repository": "",
+    "author": "",
+    "license": ""
+}

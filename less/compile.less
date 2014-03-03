@@ -1,0 +1,64 @@
+@import "./bootstrap/bootstrap.less";
+
+#outputContainer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 70px;
+	top: 0;
+	
+	padding: 20px;
+	
+	color: white;
+	font-family: 'Monaco', 'Courier New', 'Courier', monospace;
+	background: #35443e;
+	
+	overflow-y: scroll;
+	word-wrap: break-word;
+	
+	.log-entry {
+		clear: both;
+		word-wrap: break-word;
+		font-size: 11px;
+		
+		.log-pre {
+			background-color: ghostwhite;
+			border: 1px solid silver;
+			padding: 10px 20px;
+			margin: 20px; 
+			border-radius: 5px;
+		}
+		
+		div.log-pre {
+			padding: 7px 20px;
+			font-size: 12px;
+		}
+		.json-key {
+		   color: brown;
+		}
+		.json-value {
+		   color: navy;
+		}
+		.json-string {
+		   color: olive;
+		}
+	}
+}
+
+#outputContainer.mini {
+	.log-entry-mini {
+		display: block;
+	}
+	.log-entry-large {
+		display: none;
+	}
+}
+
+#outputContainer.large {
+	.log-entry-mini {
+		display: none;
+	}
+	.log-entry-large {
+		display: block;
+	}
+}

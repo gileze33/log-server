@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		
+		<title>log-server</title>
+		
+		<!-- Core CSS -->
+		<link href="/styles.css" rel="stylesheet">
+		
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+		<![endif]-->
+		
+		<script src="/js/moment.min.js"></script>
+		<script src="/js/jquery.js"></script> 
+		<script src="/js/jquery.cookie.js"></script> 
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/js/handlebars.min.js"></script>
+		<script src="/js/tpl.js"></script>
+	</head>
+	
+	<body class="">
+	
+		<div id="outputContainer" class="large">
+		
+		</div>
+	
+		<div class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
+	        <div>
+				<form class="navbar-form" role="form">
+					<div style="float: right;">
+						<a href="#" id="searchButton" class="btn btn-success">search</a> &nbsp; &nbsp;
+						<a href="#" class="log-size-btn btn btn-warning">s</a>
+					</div>
+					<div style="float: left;">
+						<select class="form-control" style="width: 90px;" id="levelSelect">
+							<option value="">Level</option>
+							<option>info</option>
+							<option>success</option>
+							<option>warn</option>
+							<option>error</option>
+							<option>fatal</option>
+						</select> &nbsp;
+						<select class="form-control" style="width: 140px;" id="environmentSelect">
+							<option value="">Any environment</option>
+							<option>*.development</option>
+							<option>*.staging</option>
+							<option>*.production</option>
+							<option>www.development</option>
+							<option>www.staging</option>
+							<option>www.production</option>
+							<option>b2b.development</option>
+							<option>b2b.staging</option>
+							<option>b2b.production</option>
+							<option>api.development</option>
+							<option>api.staging</option>
+							<option>api.production</option>
+						</select>
+					</div>
+					<div style="margin-right: 130px; margin-left: 260px;">
+						<input type="text" placeholder="Enter your query" id="searchField" class="input-block form-control">
+					</div>
+				</form>
+	        </div><!--/.navbar-collapse -->
+	    </div>
+	    
+	    <script id="log-template" type="text/x-handlebars-template">
+	    	<div>
+	    	<div style="margin-bottom: 6px;" class="log-entry" id="logEntry{{id}}">
+	    		<div class="log-entry-mini">
+	    			<div style="float: left;">
+		    			{{#if levels.success}}
+		    				<span style="color: lightgreen;">{{{level}}}</span>
+		    			{{/if}}
+		    			{{#if levels.info}}
+		    				<span style="color: deepskyblue;">{{{level}}}</span>
+		    			{{/if}}
+		    			{{#if levels.trace}}
+		    				<span style="color: lightgrey;">{{{level}}}</span>
+		    			{{/if}}
+		    			{{#if levels.warn}}
+		    				<span style="color: yellow;">{{{level}}}</span>
+		    			{{/if}}
+		    			{{#if levels.error}}
+		    				<span style="color: red;">{{{level}}}</span>
+		    			{{/if}}
+				    			 
+		    			{{tag}} 
+		    			{{label}} 
+	    			</div>
+	    			
+	    			<div style="margin-left: 360px; height: 14px; overflow: hidden;" class="log-pre-container-closed">
+	    				<a href="#" class="log-pre-btn needs-click-handler">[+]</a> {{{dataRaw}}}
+	    			</div>
+	    			<div style="margin-left: 360px; overflow: hidden; display: none;" class="log-pre-container-open">
+	    				<a href="#" class="log-pre-btn needs-click-handler">[-]</a> {{{dataRaw}}}
+	    			</div>
+	    		</div>
+	    		
+	    		<div class="log-entry-large">
+		    		<div style="float: left;">
+		    			<div style="margin-bottom: 2px; font-weight: bold;">
+			    			{{#if levels.success}}
+			    				<span style="color: lightgreen;">{{{level}}}</span>
+			    			{{/if}}
+			    			{{#if levels.info}}
+			    				<span style="color: deepskyblue;">{{{level}}}</span>
+			    			{{/if}}
+			    			{{#if levels.trace}}
+			    				<span style="color: lightgrey;">{{{level}}}</span>
+			    			{{/if}}
+			    			{{#if levels.warn}}
+			    				<span style="color: yellow;">{{{level}}}</span>
+			    			{{/if}}
+			    			{{#if levels.error}}
+			    				<span style="color: red;">{{{level}}}</span>
+			    			{{/if}}
+			    			 
+			    			{{tag}} 
+		    			</div>
+		    			 
+		    			<span style="font-size: 13px;">{{label}} </span>
+		    		</div>
+					<div style="margin-left: 240px;">
+			    		<div style="float: left; margin-left: 20px; margin-top: 2px;">
+			    			<a href="#" class="log-pre-btn needs-click-handler btn btn-sm btn-info">a</a>
+			    		</div>
+			    		
+			    		<div style="margin-left: 45px;">
+							<div class="log-pre log-pre-container-closed" style="display: block; overflow: hidden;text-overflow:ellipsis;"><div style="text-overflow:ellipsis; color: #888">{{{dataRaw}}}</div></div>
+							<pre class="log-pre log-pre-container-open" style="display: none;"><code>{{{data}}}</code></pre>
+			    		</div>
+					</div>
+	    		</div>
+	    	</div>
+	    	</div>
+		</script>
+		
+		<script src="http://localhost:3003/socket.io/socket.io.js"></script>
+	    
+	    <script>
+	    	var source   = $("#log-template").html();
+	    	var logTemplate = Handlebars.compile(source);
+	    
+	    	if (!library)
+			   var library = {};
+			
+			library.json = {
+			   replacer: function(match, pIndent, pKey, pVal, pEnd) {
+			      var key = '<span class=json-key>';
+			      var val = '<span class=json-value>';
+			      var str = '<span class=json-string>';
+			      var r = pIndent || '';
+			      if (pKey)
+			         r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+			      if (pVal)
+			         r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+			      return r + (pEnd || '');
+			   },
+			   prettyPrint: function(obj) {
+			      var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+			      return JSON.stringify(obj, null, 3)
+			         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+			         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+			         .replace(jsonLine, library.json.replacer);
+			   }
+			};
+			
+			var logs = [];/*{
+				id: '1',
+				level: 'error',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}, {
+				id: '1',
+				level: 'success',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}, {
+				id: '1',
+				level: 'info',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}, {
+				id: '1',
+				level: 'info',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}, {
+				id: '1',
+				level: 'warn',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}, {
+				id: '1',
+				level: 'trace',
+				tag: 'development.www',
+				label: 'heresa.longLabelNameHereYes',
+				data: {test: 'hi', another: 2}
+			}];*/
+			
+			var outputLog = function(entry) {
+				var templateData = {
+					level: entry.level,
+					tag: entry.env,
+					label: entry.label,
+					data: library.json.prettyPrint(entry.data),
+					dataRaw: JSON.stringify(entry.data),
+					id: entry._id
+				};
+				
+				templateData.levels = {};
+				templateData.levels[templateData.level] = true;
+				
+				if(templateData.level.length == 4) {
+					templateData.level = templateData.level + '&nbsp;&nbsp;&nbsp;';
+				}
+				else if(templateData.level.length == 5) {
+					templateData.level = templateData.level + '&nbsp;&nbsp;';
+				}
+				else if(templateData.level.length == 6) {
+					templateData.level = templateData.level + '&nbsp;';
+				}
+				
+				$('#outputContainer').append(logTemplate(templateData));
+			};
+			
+			var setClickHandlers = function() {
+				$('.log-pre-btn.needs-click-handler').removeClass('needs-click-handler').click(function(e) {
+					e.preventDefault();
+					
+					var container = $(this).parents('.log-entry');
+					var containerID = container.attr('id');
+					
+					///alert(containerID);
+					
+					if($(container).data('open') != 'true') {
+						$('#'+containerID+' .log-pre-container-closed').hide();
+						$('#'+containerID+' .log-pre-container-open').show();
+						$(container).data('open', 'true');
+						//alert('opened');
+					}
+					else {
+						$('#'+containerID+' .log-pre-container-open').hide();
+						$('#'+containerID+' .log-pre-container-closed').show();
+						$(container).data('open', 'false');
+						//alert('closed');
+					}
+				});
+			};
+			
+			if($.cookie('size') == 'mini') {
+				$('#outputContainer').addClass('mini').removeClass('large');
+			}
+			
+			$('.log-size-btn').click(function(e) {
+				e.preventDefault();
+				
+				if($.cookie('size') == 'mini') {
+					$('#outputContainer').addClass('large').removeClass('mini');
+					$.cookie('size', 'large');
+				}
+				else {
+					$('#outputContainer').addClass('mini').removeClass('large');
+					$.cookie('size', 'mini');
+				}
+			});
+			
+			var query = {};
+			var connected = false;
+			$('#searchButton').click(function(e) {
+				e.preventDefault();
+				
+				$('#outputContainer').html('');
+				
+				query = {};
+				
+				if($('#searchField').val() != '') {
+					query.data = JSON.parse($('#searchField').val());
+				}
+				if($('#environmentSelect').val() != '') {
+					query.env = $('#environmentSelect').val();
+				}
+				if($('#levelSelect').val() != '') {
+					query.level = $('#levelSelect').val();
+				}
+			
+				if(connected) {
+					socket.emit('subscribe', query);
+				}
+			});
+			
+			var socket = io.connect('http://localhost:3003');
+			socket.on('data', function (data) {
+				console.log(data);
+				if(data.type == 'log') {
+					outputLog(data.data);
+					
+					setClickHandlers();
+				}
+			});
+			socket.on('welcome', function (data) {
+				socket.emit('subscribe', query);
+				connected = true;
+			});
+			
+			
+			for(var i=0; i<logs.length; i++) {
+				outputLog(logs[i]);
+			}
+			
+			setClickHandlers();
+	    </script>
+		
+	</body>
+</html>
+		
